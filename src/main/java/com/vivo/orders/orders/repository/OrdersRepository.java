@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 
-public interface OrdersRepository extends JpaRepository<ResultDto, Long> {
 
-    List<ItemsDto> findByItens(Long itens);
+public interface OrdersRepository extends JpaRepository<ResultDto, Long> {
 
 
 

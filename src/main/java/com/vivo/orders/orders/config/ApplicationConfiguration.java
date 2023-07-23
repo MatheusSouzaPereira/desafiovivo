@@ -10,10 +10,9 @@ import org.springframework.context.annotation.Configuration;
 
 public class ApplicationConfiguration {
 
-//    @Value("products.url")
-//    private String productsUrl ;
-//
-//    @Value("users.url")
-//    private String usersUrl ;
+
+
+    @Value("users.url")
+    private String usersUrl ;
 
 }

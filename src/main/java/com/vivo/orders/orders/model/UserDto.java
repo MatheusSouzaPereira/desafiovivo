@@ -1,5 +1,7 @@
-package com.vivo.orders.orders.dto;
+package com.vivo.orders.orders.model;
 
+import com.vivo.orders.orders.dto.AddressDto;
+import com.vivo.orders.orders.dto.NameDto;
 import lombok.Data;
 
 @Data

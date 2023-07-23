@@ -1,25 +1,30 @@
 package com.vivo.orders.orders.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Generated;
 
-@Table
+import java.util.UUID;
+
+
 @Data
 @Entity
+@JsonInclude()
+@Table(name = "items")
 public class ItemsDto {
+
     @Id
-    @Column(name = "idProduto")
+    @Column(name = "id_produtc_sa")
     private Long id ;
 
-    @Column(name = "preco")
+    @JsonInclude()
+    @Column(name = "preco_produto")
     private float price ;
 
-    @Column(name = "valor")
+    @Column(name = "valor_produto")
     private Long amount ;
 
-    @Column(name = "valor_parcial")
+    @Column(name = "valor_parcial_produto")
     private float partialAmount ;
 }
