@@ -92,18 +92,16 @@ public class OrderServiceImpl implements OrderService {
             if(Boolean.FALSE.equals(itemsDtoList.isEmpty())){
                 for (ItemsDto item : itemsDtoList) {
                     if(item.getId() == productsDto.getId()) {
-                        if (itemsDto.getAmount() == null) {
-                            itemsDto.setAmount(1L);
-                        }
-                        item.setAmount(item.getAmount() + 1L);
-                        item.setPrice(productsDto.getPrice() + item.getPrice());
-                        // itemsDto.setPartialAmount(item.getPartialAmount() + productsDto.getPrice());
 
-                        resultDto.setTotalPrice(productsDto.getPrice() + item.getPrice());
+                        item.setAmount(item.getAmount() + 1L);
+                        item.setPartialAmount(productsDto.getPrice() + item.getPrice());
+
+
+                        resultDto.setTotalPrice( item.getPartialAmount());
 
 
                     }
-                    resultDto.setTotalPrice( productsDto.getPrice() + itemsDto.getPrice());
+                    resultDto.setTotalPrice( item.getPrice() + productsDto.getPrice());
 
                 }
             }
@@ -115,11 +113,10 @@ public class OrderServiceImpl implements OrderService {
 
 
             }
-            resultDto.setTotalPrice( productsDto.getPrice() + itemsDto.getPrice() + resultDto.getTotalPrice());
 
-
+          //  resultDto.setTotalPrice(itemsDto.getPrice()+ resultDto.getTotalPrice());
             itemsDtoList.add(itemsDto);
-            resultDto.setProducts(itemsDtoList);
+            resultDto.setItems(itemsDtoList);
 
             return productsDto;
         }catch (Exception e){

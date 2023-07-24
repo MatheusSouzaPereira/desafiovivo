@@ -35,7 +35,7 @@ public class ResultDto {
     @JsonInclude()
     @Column(name = "itens")
     @Transient
-    private List<ItemsDto> products ;
+    private List<ItemsDto> items ;
 
 
 }

@@ -13,13 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     @Autowired
-    OrderService service ;
-
-
+    private OrderService service ;
 
     @PostMapping("/createOrders")
     public ResponseEntity<ResultDto> createOrders(@RequestBody ResultDto resultDto) throws Exception {
-        return new ResponseEntity<>(service.order(resultDto.getUserId(), resultDto.getProducts() ), HttpStatus.OK);
+        return new ResponseEntity<>(service.order(resultDto.getUserId(), resultDto.getItems() ), HttpStatus.OK);
     }
 
     @PutMapping("/atualizarStatus")
