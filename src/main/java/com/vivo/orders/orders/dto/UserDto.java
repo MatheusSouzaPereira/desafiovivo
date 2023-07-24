@@ -1,10 +1,12 @@
-package com.vivo.orders.orders.model;
+package com.vivo.orders.orders.dto;
 
 import com.vivo.orders.orders.dto.AddressDto;
 import com.vivo.orders.orders.dto.NameDto;
 import lombok.Data;
+import lombok.Generated;
 
 @Data
+@Generated
 public class UserDto {
 
     public Long id ;

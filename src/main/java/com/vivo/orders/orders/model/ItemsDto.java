@@ -1,4 +1,4 @@
-package com.vivo.orders.orders.dto;
+package com.vivo.orders.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -10,15 +10,16 @@ import java.util.UUID;
 
 @Data
 @Entity
-@JsonInclude()
+@Generated
 @Table(name = "items")
 public class ItemsDto {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "id_produtc_sa")
     private Long id ;
 
-    @JsonInclude()
+
     @Column(name = "preco_produto")
     private float price ;
 

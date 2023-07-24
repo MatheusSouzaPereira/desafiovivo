@@ -1,8 +1,9 @@
-package com.vivo.orders.orders.dto;
+package com.vivo.orders.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Generated;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,16 +13,18 @@ import java.util.UUID;
 @Data
 @Entity
 @Table
+@Generated
 public class ResultDto {
 
     @Id
+    @JsonInclude()
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    @JsonInclude()
     private UUID id ;
 
     @Column(name = "id_usuario")
     private Long userId;
+
 
     @Column(name = "status")
     private String status ;
@@ -31,7 +34,7 @@ public class ResultDto {
 
     @JsonInclude()
     @Column(name = "itens")
-    @OneToMany(targetEntity = ItemsDto.class, cascade = CascadeType.ALL)
+    @Transient
     private List<ItemsDto> products ;
 
 

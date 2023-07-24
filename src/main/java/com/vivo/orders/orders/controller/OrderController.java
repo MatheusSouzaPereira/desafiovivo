@@ -1,6 +1,6 @@
 package com.vivo.orders.orders.controller;
 
-import com.vivo.orders.orders.dto.ResultDto;
+import com.vivo.orders.orders.model.ResultDto;
 import com.vivo.orders.orders.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,19 +15,16 @@ public class OrderController {
     @Autowired
     OrderService service ;
 
-//    @GetMapping("/products")
-//    public ResponseEntity<ProductsDto> findProducts() {
-//        return new ResponseEntity<ProductsDto>(service.findProducts(), HttpStatus.OK);
-//    }
+
 
     @PostMapping("/createOrders")
     public ResponseEntity<ResultDto> createOrders(@RequestBody ResultDto resultDto) throws Exception {
         return new ResponseEntity<>(service.order(resultDto.getUserId(), resultDto.getProducts() ), HttpStatus.OK);
     }
 
-//    @PutMapping("/atualizarStatus")
-//    public ResponseEntity<ResultDto> updateStatus(@RequestBody ResultDto resultDto){
-//        return new ResponseEntity<ResultDto>(service.order(resultDto.getUserId(), resultDto.getProducts()), HttpStatus.OK);
-//    }
+    @PutMapping("/atualizarStatus")
+    public ResponseEntity<ResultDto> updateStatus(@RequestBody ResultDto resultDto) throws Exception {
+        return new ResponseEntity<>(service.updateStatus(resultDto.getId(), resultDto.getUserId(), resultDto.getStatus()), HttpStatus.OK);
+    }
 }
 

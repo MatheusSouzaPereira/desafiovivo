@@ -1,11 +1,10 @@
 package com.vivo.orders.orders.dto;
 
 import lombok.Data;
+import lombok.Generated;
 
-@Data
-public class NameDto {
 
-    private String firstName ;
+@Generated
+public record NameDto(String firstName, String lastName){
 
-    private String lastName;
 }
