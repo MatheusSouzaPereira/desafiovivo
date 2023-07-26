@@ -1,6 +1,7 @@
 package com.vivo.orders.orders.service.impl;
 
 
+import com.vivo.orders.orders.dto.ProductsDto;
 import com.vivo.orders.orders.dto.UserDto;
 import com.vivo.orders.orders.model.ItemsDto;
 import com.vivo.orders.orders.model.ResultDto;
@@ -13,63 +14,59 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.BufferedReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings
 public class OrderServiceImplTests {
 
-    private static final Long USER_ID = 1L;
-
-    private static final List<ItemsDto> PRODUCTS = new ArrayList<>();
-
-    private static final String  STATUS_CONCLUDED = "CONCLUDED";
-
     @InjectMocks
     private OrderServiceImpl orderServiceImpl;
 
-    @Mock
-    private Utils utils ;
-
-    @Mock
-    private UserDto userDto ;
-    UserDto user = new UserDto() ;
-    ResultDto resultDto = new ResultDto();
-
+    UserDto userDto = new UserDto();
     @Mock
     private OrdersRepository repository;
 
     @Mock
-    private OrderService service ;
+    private BufferedReader bufferedReader;
+
+    ResultDto fooBar = new ResultDto();
+    @Test
+    void testUserNotNull() throws Exception {
+        when(repository.save(any())).thenReturn(Utils.usingResultDtoStatusPending());
+
+        ResultDto resul = orderServiceImpl.order(Utils.USERID_VALID, Utils.usingListDto());
+        resul.setId(UUID.randomUUID());
+
+         assertNotNull(resul.getId());
+         assertEquals(Utils.usingResultDtoStatusPending().getStatus(), resul.getStatus());
+        assertEquals(Utils.usingResultDtoStatusPending().getUserId(), resul.getUserId());
+
+    }
 
     @Test
-    void testCreateUserNotNull() throws Exception {
-        when(utils.findByUsers(USER_ID)).thenReturn(userDto);
-
-        orderServiceImpl.order(USER_ID, PRODUCTS);
-
-        user = utils.findByUsers(USER_ID);
-        user.setId(USER_ID);
-        assertNotNull(user.getId());
+    void testUserNotExist() throws Exception {
+        UserDto user = orderServiceImpl.findByUsers(Utils.USERID_INVALID);
+        assertNull(user);
 
     }
 
     @Test
     void testUpdateStatusNotNull() throws Exception {
-        when(utils.findByUsers(USER_ID)).thenReturn(userDto);
-        when(repository.save(resultDto)).thenReturn(resultDto);
+        ResultDto resultDto = orderServiceImpl.updateStatus(Utils.usingResultDtoStatusPending());
 
-        orderServiceImpl.updateStatus(resultDto.getId(), USER_ID, resultDto.getStatus());
-        resultDto.setStatus(STATUS_CONCLUDED);
-        resultDto = repository.save(resultDto);
-
-        assertEquals(resultDto.getStatus(), STATUS_CONCLUDED);
+        assertEquals(resultDto.getStatus(), Utils.RESULTDTO_STATUS_PENDING);
 
     }
     @Test
@@ -79,5 +76,12 @@ public class OrderServiceImplTests {
         });
     }
 
+    @Test
+    void testFindByProductsDuplicate() throws Exception {
+        ResultDto resultDto = orderServiceImpl.order(Utils.USERID_VALID, Utils.usingListItemsDto());
+
+        assertNotNull(resultDto);
+      assertEquals(1, resultDto.getItems().size());
+    }
 
 }

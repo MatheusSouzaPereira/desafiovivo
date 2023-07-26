@@ -4,7 +4,12 @@ import lombok.Data;
 import lombok.Generated;
 
 
+@Data
 @Generated
-public record NameDto(String firstName, String lastName){
+public class NameDto {
+
+    private String firstName;
+
+    private String lastName;
 
 }

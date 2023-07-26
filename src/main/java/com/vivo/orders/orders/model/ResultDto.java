@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Generated;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
-
-
 
 @Data
 @Entity
@@ -20,22 +18,21 @@ public class ResultDto {
     @JsonInclude()
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID id ;
+    private UUID id;
 
     @Column(name = "id_usuario")
     private Long userId;
 
-
     @Column(name = "status")
-    private String status ;
+    private String status;
 
     @Column(name = "preco_total")
-    private float totalPrice ;
+    private float totalPrice;
 
     @JsonInclude()
     @Column(name = "itens")
     @Transient
-    private List<ItemsDto> items ;
+    private HashSet<ItemsDto> items;
 
 
 }

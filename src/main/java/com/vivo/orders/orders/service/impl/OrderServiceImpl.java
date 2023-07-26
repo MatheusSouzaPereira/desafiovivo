@@ -1,13 +1,13 @@
 package com.vivo.orders.orders.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.vivo.orders.orders.dto.ProductsDto;
+import com.vivo.orders.orders.dto.UserDto;
 import com.vivo.orders.orders.model.ItemsDto;
 import com.vivo.orders.orders.model.ResultDto;
-import com.vivo.orders.orders.dto.UserDto;
 import com.vivo.orders.orders.repository.OrdersRepository;
 import com.vivo.orders.orders.service.OrderService;
-import com.vivo.orders.orders.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,66 +17,111 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
-
     private static final String STATUS_PENDING = "PENDING";
-
-
-    @Autowired
-    private OrdersRepository repository;
-
-    private ResultDto resultDto = new ResultDto();
-
-
-    private Utils utils = new Utils();
-
     private static final String URL_Products = "https://fakestoreapi.com/products";
+    private static final String URL_USERS = "https://fakestoreapi.com/users";
 
     private static final int COD_SUCESS = 200;
 
+    @Autowired
+    public OrdersRepository repository;
+
+    public ResultDto resultDto = new ResultDto();
 
     List<ItemsDto> itemsDtoList = new ArrayList<>();
+
+    ItemsDto itemsDuplicate = new ItemsDto();
+
+    public ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
-    public ResultDto order(Long id, List<ItemsDto> products ) throws Exception {
+    public ResultDto order(Long id, List<ItemsDto> products) throws Exception {
+        HashSet<ItemsDto> newlist = new HashSet<ItemsDto>();
+
+
         try {
-        UserDto userId = utils.findByUsers(id);
-        if(Boolean.TRUE.equals(userId.getId().equals(null))){
-            throw new Exception("ERRO: Usuário não possui na base de dados");
-        }
-
-
-            for (ItemsDto item : products) {
-              ProductsDto productsDto = findByProducts(item.getId());
+            UserDto userId = findByUsers(id);
+            if (userId.getId().equals(null)) {
+                throw new Exception("ERRO: Usuário não possui na base de dados");
             }
 
+            for (ItemsDto item : products) {
+              findByProducts(item.getId());
+            }
+
+            resultDto.setTotalPrice((float) itemsDtoList.stream().mapToDouble(ItemsDto::getPartialAmount).sum());
+
+            newlist.addAll(itemsDtoList);
+
+            resultDto.setItems( newlist);
             resultDto.setStatus(STATUS_PENDING);
             resultDto.setUserId(id);
             repository.save(resultDto);
 
-
             return resultDto;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("ERRO: " + e);
         }
     }
 
     @Override
-    public ResultDto updateStatus(UUID id, Long userId, String status) throws Exception {
-        utils.findByUsers(userId);
-        resultDto.setStatus(status);
+    public ResultDto updateStatus(ResultDto resultDto) throws Exception {
+        findByUsers(resultDto.getUserId());
+        resultDto.setStatus(resultDto.getStatus());
         repository.save(resultDto);
         return resultDto;
     }
 
-    public ProductsDto findByProducts(Long id ) throws Exception {
-        String urlId = URL_Products + "/" + id ;
+    public ProductsDto findByProducts(Long id) throws Exception {
+        String urlId = URL_Products + "/" + id;
+
+        ItemsDto itemsDto = new ItemsDto();
+        URL url = new URL(urlId);
+        HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
+
+        if (conexao.getResponseCode() != COD_SUCESS)
+            throw new RuntimeException("HTTP error code : " + conexao.getResponseCode());
+
+        BufferedReader resposta = new BufferedReader(new InputStreamReader((conexao.getInputStream())));
+
+        ProductsDto productsDto =  objectMapper.readValue(resposta ,ProductsDto.class);
+
+        itemsDtoList.stream().forEach(item -> {
+            if(item.getId().equals(productsDto.getId())){
+                item.setAmount(item.getAmount() + 1L);
+                item.setPartialAmount(productsDto.getPrice() + item.getPartialAmount() );
+                item.setId(productsDto.getId());
+
+                itemsDuplicate.setId(productsDto.getId());
+                itemsDuplicate.setPrice(productsDto.getPrice());
+                itemsDuplicate.setAmount(1L);
+                itemsDuplicate.setPartialAmount(productsDto.getPrice());
+
+            }
+
+        });
+        if (itemsDto.getAmount() == null) {
+            itemsDto.setAmount(1L);
+            itemsDto.setId(productsDto.getId());
+            itemsDto.setPartialAmount(productsDto.getPrice());
+            itemsDto.setPrice(productsDto.getPrice());
+        }
+
+        itemsDtoList.add(itemsDto);
+        itemsDtoList.remove(itemsDuplicate);
+
+        return productsDto;
+    }
+
+    public UserDto findByUsers(Long id ) throws Exception {
+        String urlId = URL_USERS + "/" + id ;
         try {
-            ItemsDto itemsDto = new ItemsDto();
             URL url = new URL(urlId);
             HttpURLConnection conexao = (HttpURLConnection) url.openConnection();
 
@@ -87,45 +132,15 @@ public class OrderServiceImpl implements OrderService {
             String jsonEmString = converteJsonEmString(resposta);
 
             Gson gson = new Gson();
-            ProductsDto productsDto = gson.fromJson(jsonEmString , ProductsDto.class);
+            UserDto userDto = gson.fromJson(jsonEmString , UserDto.class);
 
-            if(Boolean.FALSE.equals(itemsDtoList.isEmpty())){
-                for (ItemsDto item : itemsDtoList) {
-                    if(item.getId() == productsDto.getId()) {
-
-                        item.setAmount(item.getAmount() + 1L);
-                        item.setPartialAmount(productsDto.getPrice() + item.getPrice());
-
-
-                        resultDto.setTotalPrice( item.getPartialAmount());
-
-
-                    }
-                    resultDto.setTotalPrice( item.getPrice() + productsDto.getPrice());
-
-                }
-            }
-            if (itemsDto.getAmount() == null) {
-                itemsDto.setAmount(1L);
-                itemsDto.setId(productsDto.getId());
-                itemsDto.setPartialAmount(productsDto.getPrice());
-                itemsDto.setPrice(productsDto.getPrice());
-
-
-            }
-
-          //  resultDto.setTotalPrice(itemsDto.getPrice()+ resultDto.getTotalPrice());
-            itemsDtoList.add(itemsDto);
-            resultDto.setItems(itemsDtoList);
-
-            return productsDto;
+            return userDto;
         }catch (Exception e){
             throw new Exception("ERRO: " + e);
 
         }
 
     }
-
     public static String converteJsonEmString(BufferedReader buffereReader) throws IOException {
         String resposta, jsonEmString = "";
         while ((resposta = buffereReader.readLine()) != null) {

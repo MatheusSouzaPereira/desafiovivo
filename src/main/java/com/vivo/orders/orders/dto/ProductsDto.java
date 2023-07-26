@@ -1,7 +1,6 @@
 package com.vivo.orders.orders.dto;
 
 
-import com.vivo.orders.orders.dto.RatingDto;
 import lombok.Data;
 import lombok.Generated;
 
@@ -11,6 +10,8 @@ public class ProductsDto {
 
 
     private Long id ;
+
+    private String title ;
 
     private float price ;
 

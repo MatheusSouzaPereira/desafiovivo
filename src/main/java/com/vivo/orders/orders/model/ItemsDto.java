@@ -15,17 +15,16 @@ import java.util.UUID;
 public class ItemsDto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_produtc_sa")
-    private Long id ;
-
+    private Long id;
 
     @Column(name = "preco_produto")
-    private float price ;
+    private float price;
 
     @Column(name = "valor_produto")
-    private Long amount ;
+    private Long amount;
 
     @Column(name = "valor_parcial_produto")
-    private float partialAmount ;
+    private float partialAmount;
 }

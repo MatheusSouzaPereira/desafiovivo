@@ -11,7 +11,7 @@ public class AddressDto {
 
     private String street;
 
-    private Long number ;
+    private Long number;
 
-    private String zipCode ;
+    private String zipCode;
 }
