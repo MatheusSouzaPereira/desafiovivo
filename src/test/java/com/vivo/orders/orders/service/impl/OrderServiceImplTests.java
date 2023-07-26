@@ -33,15 +33,12 @@ public class OrderServiceImplTests {
 
     @InjectMocks
     private OrderServiceImpl orderServiceImpl;
-
-    UserDto userDto = new UserDto();
     @Mock
     private OrdersRepository repository;
 
     @Mock
     private BufferedReader bufferedReader;
 
-    ResultDto fooBar = new ResultDto();
     @Test
     void testUserNotNull() throws Exception {
         when(repository.save(any())).thenReturn(Utils.usingResultDtoStatusPending());
